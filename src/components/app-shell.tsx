@@ -163,6 +163,27 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { dark, toggle } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) void navigate({ to: "/auth" });
+  }, [loading, user, navigate]);
+
+  const name = displayNameOf(user);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    void navigate({ to: "/auth" });
+  };
+
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" aria-label="Loading" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-background">
