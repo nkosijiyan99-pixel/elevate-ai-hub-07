@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   Bookmark,
@@ -6,6 +6,7 @@ import {
   Grid2x2Check,
   LayoutDashboard,
   Library,
+  Loader2,
   Mail,
   Menu,
   MessagesSquare,
@@ -36,6 +37,8 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AI_DISCLAIMER, notifications } from "@/lib/demo-data";
+import { supabase } from "@/integrations/supabase/client";
+import { displayNameOf, initialsOf, useAuth } from "@/lib/use-auth";
 import { cn } from "@/lib/utils";
 
 export const NAV_ITEMS = [
@@ -268,18 +271,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Button variant="ghost" className="gap-2 px-1.5 sm:px-2" aria-label="User profile">
                 <Avatar className="size-8">
                   <AvatarFallback className="brand-gradient-bg text-xs font-semibold text-primary-foreground">
-                    NJ
+                    {initialsOf(name)}
                   </AvatarFallback>
                 </Avatar>
-                <span className="hidden text-sm font-medium sm:inline">Nkosingiphile</span>
+                <span className="hidden max-w-32 truncate text-sm font-medium sm:inline">{name}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col">
-                  <span>Nkosingiphile Jiyane</span>
-                  <span className="text-xs font-normal text-muted-foreground">
-                    Operations Lead · Pro plan
+                  <span className="truncate">{name}</span>
+                  <span className="truncate text-xs font-normal text-muted-foreground">
+                    {user.email}
                   </span>
                 </div>
               </DropdownMenuLabel>
@@ -291,7 +294,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link to="/history">Saved history</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Sign out</DropdownMenuItem>
+              <DropdownMenuItem onClick={signOut}>Sign out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
