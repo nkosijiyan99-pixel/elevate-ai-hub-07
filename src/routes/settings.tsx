@@ -58,7 +58,10 @@ function SettingsPage() {
       .from("profiles")
       .upsert({ id: user.id, display_name: profile.display_name, job_title: profile.job_title });
     setSavingProfile(false);
-    if (error) return toast.error("Could not save your profile.");
+    if (error) {
+      toast.error("Could not save your profile.");
+      return;
+    }
     toast.success("Profile saved");
   };
 
@@ -140,7 +143,7 @@ function SettingsPage() {
               <Switch
                 id={key}
                 checked={toggles[key as keyof typeof toggles]}
-                onCheckedChange={(v) => setToggles({ ...toggles, [key]: v })}
+                onCheckedChange={(v) => setToggles({ ...toggles, [key as string]: v })}
               />
             </div>
           ))}
@@ -159,7 +162,7 @@ function SettingsPage() {
               <Switch
                 id={key}
                 checked={toggles[key as keyof typeof toggles]}
-                onCheckedChange={(v) => setToggles({ ...toggles, [key]: v })}
+                onCheckedChange={(v) => setToggles({ ...toggles, [key as string]: v })}
               />
             </div>
           ))}

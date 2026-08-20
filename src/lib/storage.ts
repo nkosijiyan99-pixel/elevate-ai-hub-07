@@ -96,7 +96,10 @@ export function useHistory() {
   const remove = useCallback(
     async (id: string) => {
       const { error } = await supabase.from("history_items").delete().eq("id", id);
-      if (error) return toast.error("Could not delete that item.");
+      if (error) {
+        toast.error("Could not delete that item.");
+        return;
+      }
       await sync();
     },
     [sync],
@@ -106,7 +109,10 @@ export function useHistory() {
     const userId = await currentUserId();
     if (!userId) return;
     const { error } = await supabase.from("history_items").delete().eq("user_id", userId);
-    if (error) return toast.error("Could not clear your history.");
+    if (error) {
+      toast.error("Could not clear your history.");
+      return;
+    }
     await sync();
   }, [sync]);
 
@@ -234,7 +240,10 @@ export function usePrompts() {
         ? await supabase.from("prompt_templates").update(payload).eq("id", prompt.id)
         : await supabase.from("prompt_templates").insert(payload);
 
-      if (error) return toast.error("Could not save that prompt.");
+      if (error) {
+        toast.error("Could not save that prompt.");
+        return;
+      }
       toast.success(prompt.custom ? "Prompt updated" : "Prompt saved to your library");
       await sync();
     },
@@ -245,7 +254,10 @@ export function usePrompts() {
     async (id: string) => {
       if (custom.some((p) => p.id === id)) {
         const { error } = await supabase.from("prompt_templates").delete().eq("id", id);
-        if (error) return toast.error("Could not delete that prompt.");
+        if (error) {
+          toast.error("Could not delete that prompt.");
+          return;
+        }
       } else {
         const next = [...new Set([...readHiddenDefaults(), id])];
         writeHiddenDefaults(next);
