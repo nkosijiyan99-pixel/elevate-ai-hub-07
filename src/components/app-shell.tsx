@@ -58,7 +58,7 @@ function useTheme() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("workflow-ai:theme");
+    const stored = window.localStorage.getItem("cadence:theme");
     const isDark = stored ? stored === "dark" : false;
     setDark(isDark);
     document.documentElement.classList.toggle("dark", isDark);
@@ -68,7 +68,7 @@ function useTheme() {
     setDark((prev) => {
       const next = !prev;
       document.documentElement.classList.toggle("dark", next);
-      window.localStorage.setItem("workflow-ai:theme", next ? "dark" : "light");
+      window.localStorage.setItem("cadence:theme", next ? "dark" : "light");
       return next;
     });
   };
@@ -78,13 +78,13 @@ function useTheme() {
 
 function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <Link to="/" className="flex items-center gap-2.5" aria-label="WorkFlow AI home">
+    <Link to="/" className="flex items-center gap-2.5" aria-label="Cadence home">
       <span className="brand-gradient-bg flex size-9 shrink-0 items-center justify-center rounded-xl text-primary-foreground shadow-sm">
         <Grid2x2Check className="size-5" aria-hidden />
       </span>
       {!compact && (
         <span className="flex flex-col leading-none">
-          <span className="text-[15px] font-bold tracking-tight">WorkFlow AI</span>
+          <span className="text-[15px] font-bold tracking-tight">Cadence</span>
           <span className="text-[11px] text-muted-foreground">Workplace intelligence</span>
         </span>
       )}

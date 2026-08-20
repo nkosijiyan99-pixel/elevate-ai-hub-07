@@ -22,12 +22,12 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Settings | WorkFlow AI" },
+      { title: "Settings | Cadence" },
       {
         name: "description",
-        content: "Manage your WorkFlow AI profile, default tone, notifications and responsible-AI preferences.",
+        content: "Manage your Cadence profile, default tone, notifications and responsible-AI preferences.",
       },
-      { property: "og:title", content: "Settings | WorkFlow AI" },
+      { property: "og:title", content: "Settings | Cadence" },
       { property: "og:description", content: "Profile, workspace and responsible AI preferences." },
     ],
   }),
@@ -77,7 +77,7 @@ function SettingsPage() {
       <PageHeader
         eyebrow="Workspace"
         title="Settings"
-        description="Personalise how WorkFlow AI writes, plans and notifies you."
+        description="Personalise how Cadence writes, plans and notifies you."
       />
 
       <div className="grid gap-4 lg:grid-cols-2">

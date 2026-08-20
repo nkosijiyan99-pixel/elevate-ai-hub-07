@@ -10,13 +10,13 @@ import { copyText, useAi } from "@/lib/use-ai";
 export const Route = createFileRoute("/chat")({
   head: () => ({
     meta: [
-      { title: "Workplace AI Chat | WorkFlow AI" },
+      { title: "Workplace AI Chat | Cadence" },
       {
         name: "description",
         content:
           "Chat with an AI workplace assistant for communication, productivity, research and career guidance.",
       },
-      { property: "og:title", content: "Workplace AI Chat | WorkFlow AI" },
+      { property: "og:title", content: "Workplace AI Chat | Cadence" },
       {
         property: "og:description",
         content: "An always-on AI colleague for workplace communication and productivity.",
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/chat")({
 
 type Message = { role: "user" | "assistant"; content: string };
 
-const SYSTEM = `You are WorkFlow AI, a pragmatic workplace assistant for professionals.
+const SYSTEM = `You are Cadence, a pragmatic workplace assistant for professionals.
 Help with workplace communication, productivity advice, task organisation, research support, professional writing and career development.
 Be concise and structured: short paragraphs, bullet points where useful, and always end with a concrete next step. Never invent facts about the user's company.`;
 
@@ -68,7 +68,7 @@ function ChatPage() {
       kind: "chat",
       title: trimmed.slice(0, 70),
       preview: reply.slice(0, 140),
-      content: `You: ${trimmed}\n\nWorkFlow AI: ${reply}`,
+      content: `You: ${trimmed}\n\nCadence: ${reply}`,
     });
   }
 
@@ -173,7 +173,7 @@ function ChatPage() {
                 }
               }}
               rows={1}
-              aria-label="Message WorkFlow AI"
+              aria-label="Message Cadence"
               placeholder="Ask anything about your work..."
               className="max-h-40 min-h-11 resize-none"
             />

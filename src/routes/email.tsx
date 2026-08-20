@@ -21,13 +21,13 @@ import { saveHistory } from "@/lib/storage";
 export const Route = createFileRoute("/email")({
   head: () => ({
     meta: [
-      { title: "Smart Email Generator | WorkFlow AI" },
+      { title: "Smart Email Generator | Cadence" },
       {
         name: "description",
         content:
           "Generate polished workplace emails with tone control, professionalism scoring and clarity feedback.",
       },
-      { property: "og:title", content: "Smart Email Generator | WorkFlow AI" },
+      { property: "og:title", content: "Smart Email Generator | Cadence" },
       {
         property: "og:description",
         content: "AI-written workplace emails with tone control and quality scoring.",
@@ -196,7 +196,7 @@ Tone: ${form.tone}`;
               <Sparkles className="size-6 text-accent" aria-hidden />
               <p className="text-sm font-medium">Your generated email will appear here</p>
               <p className="max-w-sm text-xs text-muted-foreground">
-                Describe the purpose, pick a tone and WorkFlow AI will draft a ready-to-send message.
+                Describe the purpose, pick a tone and Cadence will draft a ready-to-send message.
               </p>
             </div>
           )}
@@ -213,7 +213,7 @@ Tone: ${form.tone}`;
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => downloadText("workflow-ai-email.txt", draft)}
+                      onClick={() => downloadText("cadence-email.txt", draft)}
                     >
                       <Download className="size-4" aria-hidden /> Download
                     </Button>

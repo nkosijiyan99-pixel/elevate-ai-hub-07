@@ -12,13 +12,13 @@ import { copyText, downloadText, extractJson, useAi } from "@/lib/use-ai";
 export const Route = createFileRoute("/research")({
   head: () => ({
     meta: [
-      { title: "AI Research Assistant | WorkFlow AI" },
+      { title: "AI Research Assistant | Cadence" },
       {
         name: "description",
         content:
           "Get structured business research briefs with insights, opportunities, risks, recommendations and quick facts.",
       },
-      { property: "og:title", content: "AI Research Assistant | WorkFlow AI" },
+      { property: "og:title", content: "AI Research Assistant | Cadence" },
       {
         property: "og:description",
         content: "Professional research reports generated from any workplace topic or question.",

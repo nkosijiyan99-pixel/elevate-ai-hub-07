@@ -13,7 +13,7 @@ export type HistoryItem = {
   createdAt: string;
 };
 
-const CHANGE_EVENT = "workflow-ai:store";
+const CHANGE_EVENT = "cadence:store";
 
 function notify(scope: "history" | "prompts") {
   if (typeof window === "undefined") return;
@@ -174,7 +174,7 @@ export const DEFAULT_PROMPTS: PromptTemplate[] = [
   },
 ];
 
-const HIDDEN_DEFAULTS_KEY = "workflow-ai:hidden-default-prompts";
+const HIDDEN_DEFAULTS_KEY = "cadence:hidden-default-prompts";
 
 function readHiddenDefaults(): string[] {
   if (typeof window === "undefined") return [];
