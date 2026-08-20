@@ -77,14 +77,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Cadence — Your workplace intelligence layer" },
+      {
+        name: "description",
+        content:
+          "Cadence brings email drafting, meeting summaries, task planning, research and productivity insights into one AI workspace.",
+      },
+      { name: "author", content: "Cadence" },
+      { property: "og:title", content: "Cadence — Workplace intelligence layer" },
+      {
+        property: "og:description",
+        content: "One AI workspace for emails, meetings, planning, research and insights.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
