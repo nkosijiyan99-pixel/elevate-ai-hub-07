@@ -25,13 +25,13 @@ import { extractJson, useAi } from "@/lib/use-ai";
 export const Route = createFileRoute("/insights")({
   head: () => ({
     meta: [
-      { title: "AI Productivity Insights | WorkFlow AI" },
+      { title: "AI Productivity Insights | Cadence" },
       {
         name: "description",
         content:
           "An AI insights engine that scores your productivity, spots bottlenecks and recommends focus changes.",
       },
-      { property: "og:title", content: "AI Productivity Insights | WorkFlow AI" },
+      { property: "og:title", content: "AI Productivity Insights | Cadence" },
       {
         property: "og:description",
         content: "Productivity scoring, performance summaries and smart recommendations powered by AI.",
@@ -141,7 +141,7 @@ function InsightsPage() {
       <PageHeader
         eyebrow="Signature feature"
         title="AI Productivity Insights Engine"
-        description="WorkFlow AI analyses your activity patterns, scores your week and recommends the changes with the highest payoff."
+        description="Cadence analyses your activity patterns, scores your week and recommends the changes with the highest payoff."
         actions={
           <Button onClick={() => void analyze()} disabled={loading}>
             {loading ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}

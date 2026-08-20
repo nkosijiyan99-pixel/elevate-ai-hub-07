@@ -21,13 +21,13 @@ import { copyText, downloadText, extractJson, useAi } from "@/lib/use-ai";
 export const Route = createFileRoute("/meetings")({
   head: () => ({
     meta: [
-      { title: "Meeting Notes Summarizer | WorkFlow AI" },
+      { title: "Meeting Notes Summarizer | Cadence" },
       {
         name: "description",
         content:
           "Turn long meeting notes into executive summaries, decisions, owned action items, risks and follow-ups.",
       },
-      { property: "og:title", content: "Meeting Notes Summarizer | WorkFlow AI" },
+      { property: "og:title", content: "Meeting Notes Summarizer | Cadence" },
       {
         property: "og:description",
         content: "Executive summaries, decisions and action items extracted from raw meeting notes.",
@@ -105,7 +105,7 @@ function MeetingsPage() {
       <PageHeader
         eyebrow="Feature 02"
         title="Meeting Notes Summarizer"
-        description="Paste raw notes or a transcript. WorkFlow AI extracts decisions, owned action items, risks and follow-ups."
+        description="Paste raw notes or a transcript. Cadence extracts decisions, owned action items, risks and follow-ups."
         actions={
           <Button variant="outline" onClick={() => setNotes(SAMPLE)}>
             Load sample notes

@@ -13,13 +13,13 @@ import { useAuth } from "@/lib/use-auth";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in | WorkFlow AI" },
+      { title: "Sign in | Cadence" },
       {
         name: "description",
         content:
-          "Sign in to WorkFlow AI to keep your AI-generated emails, meeting summaries, plans and research saved to your account.",
+          "Sign in to Cadence to keep your AI-generated emails, meeting summaries, plans and research saved to your account.",
       },
-      { property: "og:title", content: "Sign in to WorkFlow AI" },
+      { property: "og:title", content: "Sign in to Cadence" },
       {
         property: "og:description",
         content: "Access your saved AI drafts, summaries, plans and prompt library.",
@@ -96,7 +96,7 @@ function AuthPage() {
           <span className="brand-gradient-bg flex size-12 items-center justify-center rounded-2xl text-primary-foreground shadow-sm">
             <Grid2x2Check className="size-6" aria-hidden />
           </span>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome to WorkFlow AI</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Welcome to Cadence</h1>
           <p className="text-sm text-muted-foreground">
             Sign in so every draft, summary, plan and prompt is saved to your account.
           </p>

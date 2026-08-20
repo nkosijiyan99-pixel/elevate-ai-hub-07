@@ -31,13 +31,13 @@ import { activityFeed, completionRates, productivityTrend, toolUsage } from "@/l
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "WorkFlow AI — Intelligent Workplace Productivity Dashboard" },
+      { title: "Cadence — Intelligent Workplace Productivity Dashboard" },
       {
         name: "description",
         content:
-          "WorkFlow AI unifies email drafting, meeting summaries, task planning, research and productivity insights in one enterprise AI workspace.",
+          "Cadence unifies email drafting, meeting summaries, task planning, research and productivity insights in one enterprise AI workspace.",
       },
-      { property: "og:title", content: "WorkFlow AI — Workplace Productivity Assistant" },
+      { property: "og:title", content: "Cadence — Workplace Productivity Assistant" },
       {
         property: "og:description",
         content: "One AI workspace for emails, meetings, planning, research and productivity insights.",

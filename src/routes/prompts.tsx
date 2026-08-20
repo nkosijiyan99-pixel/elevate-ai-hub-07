@@ -29,13 +29,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/prompts")({
   head: () => ({
     meta: [
-      { title: "AI Prompt Library | WorkFlow AI" },
+      { title: "AI Prompt Library | Cadence" },
       {
         name: "description",
         content:
           "Browse, edit and save reusable prompt templates for emails, meetings, research, planning and chat.",
       },
-      { property: "og:title", content: "AI Prompt Library | WorkFlow AI" },
+      { property: "og:title", content: "AI Prompt Library | Cadence" },
       { property: "og:description", content: "Reusable, editable prompt templates for every workplace AI task." },
     ],
   }),
@@ -56,7 +56,7 @@ function PromptsPage() {
       <PageHeader
         eyebrow="Prompt engineering"
         title="AI Prompt Library"
-        description="The prompt patterns powering WorkFlow AI. Tune them to your team's voice or add your own."
+        description="The prompt patterns powering Cadence. Tune them to your team's voice or add your own."
         actions={
           <>
             <Button variant="outline" onClick={reset}>

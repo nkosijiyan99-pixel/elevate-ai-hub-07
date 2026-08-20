@@ -12,13 +12,13 @@ import { copyText } from "@/lib/use-ai";
 export const Route = createFileRoute("/history")({
   head: () => ({
     meta: [
-      { title: "Saved History | WorkFlow AI" },
+      { title: "Saved History | Cadence" },
       {
         name: "description",
         content:
-          "Search, filter and manage every email, meeting summary, research report, plan and chat WorkFlow AI created for you.",
+          "Search, filter and manage every email, meeting summary, research report, plan and chat Cadence created for you.",
       },
-      { property: "og:title", content: "Saved History | WorkFlow AI" },
+      { property: "og:title", content: "Saved History | Cadence" },
       { property: "og:description", content: "All your AI-generated workplace output in one searchable place." },
     ],
   }),
@@ -53,7 +53,7 @@ function HistoryPage() {
       <PageHeader
         eyebrow="Workspace memory"
         title="Saved History"
-        description="Everything WorkFlow AI has generated for you, saved securely to your account."
+        description="Everything Cadence has generated for you, saved securely to your account."
         actions={
           items.length > 0 ? (
             <Button variant="outline" onClick={clear}>
