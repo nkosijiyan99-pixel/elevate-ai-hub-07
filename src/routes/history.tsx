@@ -53,7 +53,7 @@ function HistoryPage() {
       <PageHeader
         eyebrow="Workspace memory"
         title="Saved History"
-        description="Everything WorkFlow AI has generated for you, stored locally on this device."
+        description="Everything WorkFlow AI has generated for you, saved securely to your account."
         actions={
           items.length > 0 ? (
             <Button variant="outline" onClick={clear}>

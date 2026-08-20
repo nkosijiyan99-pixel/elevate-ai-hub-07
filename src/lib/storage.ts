@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export type HistoryKind = "email" | "meeting" | "research" | "plan" | "chat";
 
@@ -11,68 +13,118 @@ export type HistoryItem = {
   createdAt: string;
 };
 
-const HISTORY_KEY = "workflow-ai:history";
-const PROMPTS_KEY = "workflow-ai:prompts";
+const CHANGE_EVENT = "workflow-ai:store";
 
-function read<T>(key: string, fallback: T): T {
-  if (typeof window === "undefined") return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function write<T>(key: string, value: T) {
+function notify(scope: "history" | "prompts") {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(key, JSON.stringify(value));
-  window.dispatchEvent(new CustomEvent("workflow-ai:store", { detail: key }));
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: scope }));
 }
 
-export function saveHistory(item: Omit<HistoryItem, "id" | "createdAt">) {
-  const items = read<HistoryItem[]>(HISTORY_KEY, []);
-  const entry: HistoryItem = {
-    ...item,
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-  };
-  write(HISTORY_KEY, [entry, ...items].slice(0, 200));
-  return entry;
+async function currentUserId() {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user.id ?? null;
+}
+
+export async function saveHistory(item: Omit<HistoryItem, "id" | "createdAt">) {
+  const userId = await currentUserId();
+  if (!userId) return null;
+
+  const { data, error } = await supabase
+    .from("history_items")
+    .insert({
+      user_id: userId,
+      kind: item.kind,
+      title: item.title,
+      preview: item.preview,
+      content: item.content,
+    })
+    .select("id, kind, title, preview, content, created_at")
+    .single();
+
+  if (error) {
+    toast.error("Could not save to your history.");
+    return null;
+  }
+
+  notify("history");
+  return {
+    id: data.id,
+    kind: data.kind as HistoryKind,
+    title: data.title,
+    preview: data.preview,
+    content: data.content,
+    createdAt: data.created_at,
+  } satisfies HistoryItem;
 }
 
 export function useHistory() {
   const [items, setItems] = useState<HistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const sync = useCallback(() => setItems(read<HistoryItem[]>(HISTORY_KEY, [])), []);
+  const sync = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("history_items")
+      .select("id, kind, title, preview, content, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
 
-  useEffect(() => {
-    sync();
-    const handler = () => sync();
-    window.addEventListener("workflow-ai:store", handler);
-    window.addEventListener("storage", handler);
-    return () => {
-      window.removeEventListener("workflow-ai:store", handler);
-      window.removeEventListener("storage", handler);
-    };
-  }, [sync]);
-
-  const remove = useCallback((id: string) => {
-    write(
-      HISTORY_KEY,
-      read<HistoryItem[]>(HISTORY_KEY, []).filter((i) => i.id !== id),
-    );
+    if (!error && data) {
+      setItems(
+        data.map((row) => ({
+          id: row.id,
+          kind: row.kind as HistoryKind,
+          title: row.title,
+          preview: row.preview,
+          content: row.content,
+          createdAt: row.created_at,
+        })),
+      );
+    }
+    setLoading(false);
   }, []);
 
-  const clear = useCallback(() => write(HISTORY_KEY, []), []);
+  useEffect(() => {
+    void sync();
+    const handler = (event: Event) => {
+      if ((event as CustomEvent).detail === "prompts") return;
+      void sync();
+    };
+    window.addEventListener(CHANGE_EVENT, handler);
+    return () => window.removeEventListener(CHANGE_EVENT, handler);
+  }, [sync]);
 
-  return { items, remove, clear };
+  const remove = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from("history_items").delete().eq("id", id);
+      if (error) {
+        toast.error("Could not delete that item.");
+        return;
+      }
+      await sync();
+    },
+    [sync],
+  );
+
+  const clear = useCallback(async () => {
+    const userId = await currentUserId();
+    if (!userId) return;
+    const { error } = await supabase.from("history_items").delete().eq("user_id", userId);
+    if (error) {
+      toast.error("Could not clear your history.");
+      return;
+    }
+    await sync();
+  }, [sync]);
+
+  return { items, loading, remove, clear };
 }
+
+export type PromptCategory = "Email" | "Meetings" | "Research" | "Planning" | "Chat";
 
 export type PromptTemplate = {
   id: string;
   name: string;
-  category: "Email" | "Meetings" | "Research" | "Planning" | "Chat";
+  category: PromptCategory;
   body: string;
   custom?: boolean;
 };
@@ -122,33 +174,107 @@ export const DEFAULT_PROMPTS: PromptTemplate[] = [
   },
 ];
 
+const HIDDEN_DEFAULTS_KEY = "workflow-ai:hidden-default-prompts";
+
+function readHiddenDefaults(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(HIDDEN_DEFAULTS_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeHiddenDefaults(ids: string[]) {
+  window.localStorage.setItem(HIDDEN_DEFAULTS_KEY, JSON.stringify(ids));
+}
+
 export function usePrompts() {
-  const [prompts, setPrompts] = useState<PromptTemplate[]>(DEFAULT_PROMPTS);
+  const [custom, setCustom] = useState<PromptTemplate[]>([]);
+  const [hidden, setHidden] = useState<string[]>([]);
+
+  const sync = useCallback(async () => {
+    setHidden(readHiddenDefaults());
+    const { data, error } = await supabase
+      .from("prompt_templates")
+      .select("id, name, category, body")
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setCustom(
+        data.map((row) => ({
+          id: row.id,
+          name: row.name,
+          category: row.category as PromptCategory,
+          body: row.body,
+          custom: true,
+        })),
+      );
+    }
+  }, []);
 
   useEffect(() => {
-    setPrompts(read<PromptTemplate[]>(PROMPTS_KEY, DEFAULT_PROMPTS));
-    const handler = () => setPrompts(read<PromptTemplate[]>(PROMPTS_KEY, DEFAULT_PROMPTS));
-    window.addEventListener("workflow-ai:store", handler);
-    return () => window.removeEventListener("workflow-ai:store", handler);
-  }, []);
+    void sync();
+    const handler = (event: Event) => {
+      if ((event as CustomEvent).detail === "history") return;
+      void sync();
+    };
+    window.addEventListener(CHANGE_EVENT, handler);
+    return () => window.removeEventListener(CHANGE_EVENT, handler);
+  }, [sync]);
 
-  const save = useCallback((prompt: PromptTemplate) => {
-    const current = read<PromptTemplate[]>(PROMPTS_KEY, DEFAULT_PROMPTS);
-    const exists = current.some((p) => p.id === prompt.id);
-    write(
-      PROMPTS_KEY,
-      exists ? current.map((p) => (p.id === prompt.id ? prompt : p)) : [prompt, ...current],
-    );
-  }, []);
+  const save = useCallback(
+    async (prompt: PromptTemplate) => {
+      const userId = await currentUserId();
+      if (!userId) return;
 
-  const remove = useCallback((id: string) => {
-    write(
-      PROMPTS_KEY,
-      read<PromptTemplate[]>(PROMPTS_KEY, DEFAULT_PROMPTS).filter((p) => p.id !== id),
-    );
-  }, []);
+      const payload = {
+        user_id: userId,
+        name: prompt.name,
+        category: prompt.category,
+        body: prompt.body,
+      };
 
-  const reset = useCallback(() => write(PROMPTS_KEY, DEFAULT_PROMPTS), []);
+      const { error } = prompt.custom
+        ? await supabase.from("prompt_templates").update(payload).eq("id", prompt.id)
+        : await supabase.from("prompt_templates").insert(payload);
+
+      if (error) {
+        toast.error("Could not save that prompt.");
+        return;
+      }
+      toast.success(prompt.custom ? "Prompt updated" : "Prompt saved to your library");
+      await sync();
+    },
+    [sync],
+  );
+
+  const remove = useCallback(
+    async (id: string) => {
+      if (custom.some((p) => p.id === id)) {
+        const { error } = await supabase.from("prompt_templates").delete().eq("id", id);
+        if (error) {
+          toast.error("Could not delete that prompt.");
+          return;
+        }
+      } else {
+        const next = [...new Set([...readHiddenDefaults(), id])];
+        writeHiddenDefaults(next);
+      }
+      await sync();
+    },
+    [custom, sync],
+  );
+
+  const reset = useCallback(async () => {
+    writeHiddenDefaults([]);
+    const userId = await currentUserId();
+    if (userId) await supabase.from("prompt_templates").delete().eq("user_id", userId);
+    await sync();
+  }, [sync]);
+
+  const prompts = [...custom, ...DEFAULT_PROMPTS.filter((p) => !hidden.includes(p.id))];
 
   return { prompts, save, remove, reset };
 }

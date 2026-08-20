@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { Loader2, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AppShell, PageHeader } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
 import { AI_DISCLAIMER } from "@/lib/demo-data";
+import { useAuth } from "@/lib/use-auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({
@@ -33,6 +35,36 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState({ display_name: "", job_title: "" });
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    void supabase
+      .from("profiles")
+      .select("display_name, job_title")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setProfile({ display_name: data.display_name ?? "", job_title: data.job_title ?? "" });
+      });
+  }, [user]);
+
+  const saveProfile = async () => {
+    if (!user) return;
+    setSavingProfile(true);
+    const { error } = await supabase
+      .from("profiles")
+      .upsert({ id: user.id, display_name: profile.display_name, job_title: profile.job_title });
+    setSavingProfile(false);
+    if (error) {
+      toast.error("Could not save your profile.");
+      return;
+    }
+    toast.success("Profile saved");
+  };
+
   const [toggles, setToggles] = useState({
     weeklyDigest: true,
     deadlineAlerts: true,
@@ -53,16 +85,29 @@ function SettingsPage() {
           <h2 className="text-sm font-semibold">Profile</h2>
           <div className="space-y-2">
             <Label htmlFor="name">Full name</Label>
-            <Input id="name" defaultValue="Nkosingiphile Jiyane" />
+            <Input
+              id="name"
+              value={profile.display_name}
+              onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
-            <Input id="role" defaultValue="Operations Lead" />
+            <Input
+              id="role"
+              value={profile.job_title}
+              onChange={(e) => setProfile({ ...profile, job_title: e.target.value })}
+              placeholder="Operations Lead"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Work email</Label>
-            <Input id="email" type="email" defaultValue="nkosi@company.com" />
+            <Input id="email" type="email" value={user?.email ?? ""} readOnly disabled />
           </div>
+          <Button onClick={saveProfile} disabled={savingProfile}>
+            {savingProfile && <Loader2 className="mr-2 size-4 animate-spin" />}
+            Save profile
+          </Button>
         </section>
 
         <section className="glass-card space-y-4 p-5">
@@ -98,7 +143,7 @@ function SettingsPage() {
               <Switch
                 id={key}
                 checked={toggles[key as keyof typeof toggles]}
-                onCheckedChange={(v) => setToggles({ ...toggles, [key]: v })}
+                onCheckedChange={(v) => setToggles({ ...toggles, [key as string]: v })}
               />
             </div>
           ))}
@@ -117,7 +162,7 @@ function SettingsPage() {
               <Switch
                 id={key}
                 checked={toggles[key as keyof typeof toggles]}
-                onCheckedChange={(v) => setToggles({ ...toggles, [key]: v })}
+                onCheckedChange={(v) => setToggles({ ...toggles, [key as string]: v })}
               />
             </div>
           ))}

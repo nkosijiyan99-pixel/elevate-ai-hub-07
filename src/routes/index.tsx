@@ -25,6 +25,7 @@ import { AppShell, PageHeader } from "@/components/app-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { displayNameOf, useAuth } from "@/lib/use-auth";
 import { activityFeed, completionRates, productivityTrend, toolUsage } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/")({
@@ -41,6 +42,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "One AI workspace for emails, meetings, planning, research and productivity insights.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
@@ -95,11 +98,14 @@ const tooltipStyle = {
 };
 
 function Dashboard() {
+  const { user } = useAuth();
+  const firstName = displayNameOf(user).split(" ")[0] || "there";
+
   return (
     <AppShell>
       <PageHeader
         eyebrow="Executive overview"
-        title="Good morning, Nkosingiphile"
+        title={`Good morning, ${firstName}`}
         description="Your AI workspace is running smoothly. Productivity is up 18% week over week, with deep-work focus peaking between 09:00 and 12:00."
         actions={
           <>
